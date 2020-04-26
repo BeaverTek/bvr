@@ -1,0 +1,27 @@
+[submodule "gnu-social"]
+	path = social
+	url = git@github.com:someonewithpc/social-bvr.git
+[submodule "phpbb"]
+	path = phpbb
+	url = git@github.com:phpbb/phpbb.git
+[submodule "mediawiki"]
+	path = mediawiki
+	url = git@github.com:wikimedia/mediawiki.git
+[submodule "funkwhale"]
+	path = funk_whale
+	url = https://dev.funkwhale.audio/funkwhale/funkwhale.git
+[submodule "PeerTube"]
+	path = peer_tube
+	url = git@github.com:Chocobozzz/PeerTube.git
+[submodule "LimeSurvey"]
+	path = lime_survey
+	url = git@github.com:LimeSurvey/LimeSurvey.git
+[submodule "PASTE"]
+	path = paste
+	url = git@github.com:jordansamuel/PASTE.git
+[submodule "YOURLS"]
+	path = yourls
+	url = git@github.com:YOURLS/YOURLS.git
+[submodule "synapse"]
+	path = synapse
+	url = git@github.com:matrix-org/synapse.git
