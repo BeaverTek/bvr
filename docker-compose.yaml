@@ -41,13 +41,13 @@ services:
     depends_on:
       - nginx
       - db
-    build: social/docker/php
+    build: ./docker/php
     restart: always
     tty: true
     ports:
       - 9000:9000
     volumes:
-      - .:/var/www/social
+      - ./social:/var/www/social
     env_file:
       - social.env
 
