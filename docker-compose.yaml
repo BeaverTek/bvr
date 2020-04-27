@@ -1,34 +1,61 @@
 version: '3.3'
 
 services:
-    nginx:
-        image: nginx:alpine
-        restart: always
-        # Ensyre renewed certificates are reloaded
-        command: /bin/sh -c \
-                     'while :; do
-                         sleep 6h & wait $${!};
-                         nginx -s reload;
-                      done & nginx -g "daemon off;"'
-        ports:
-            - 80:80
-            - 443:443
-        volumes:
-            - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
-            - ./certbot/www:/var/www/certbot
-            - ./certbot/files:/etc/letsencrypt
-            - ./social:/var/www/social
-    certbot:
-        image: certbot/certbot
-        # Check for certificate renewal every 12h as
-        # recomnended by Let's Encryot
-        entrypoint: /bin/sh -c \
-                        'trap exit TERM;
-                         while :; do
-                             certbot renew > /dev/null;
-                             sleep 12h & wait $${!};
-                         done'
-        volumes:
-            - ./certbot/www:/var/www/certbot
-            - ./certbot/files:/etc/letsencrypt
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      - certbot
+    restart: always
+    # Suppress nginx noise
+    tty: false
+    # Ensyre renewed certificates are reloaded
+    command: /bin/sh -c \
+           'while :; do
+             sleep 6h & wait $${!};
+             nginx -s reload;
+           done & nginx -g "daemon off;"'
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/files:/etc/letsencrypt
+      - ./social/public:/var/www/social/public
 
+  certbot:
+    image: certbot/certbot
+    # Check for certificate renewal every 12h as
+    # recomnended by Let's Encryot
+    entrypoint: /bin/sh -c \
+            'trap exit TERM;
+             while :; do
+               certbot renew > /dev/null;
+               sleep 12h & wait $${!};
+             done'
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/files:/etc/letsencrypt
+
+  php:
+    depends_on:
+      - nginx
+      - db
+    build: social/docker/php
+    restart: always
+    tty: true
+    ports:
+      - 9000:9000
+    volumes:
+      - .:/var/www/social
+    env_file:
+      - social.env
+
+  db:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=foobar
+    env_file:
+      - social.env
+    volumes:
+      - ./docker/mariadb:/docker-entrypoint-initdb.d
