@@ -11,10 +11,4 @@ RUN apk add --virtual .phpize-deps $PHPIZE_DEPS \
 
 RUN docker-php-ext-install ${exts}
 
-WORKDIR /var/www/social
-
-# RUN . /var/social.env
-
-# RUN echo FOOO $SOCIAL_DOMAIN
-
 # RUN php ./scripts/install_cli.php -s $SOCIAL_DOMAIN #
