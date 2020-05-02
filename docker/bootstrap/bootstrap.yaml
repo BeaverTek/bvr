@@ -1,0 +1,16 @@
+version: "3.3"
+
+services:
+  bootstrap:
+    build: .
+    volumes:
+      - ../certbot/www:/var/www/certbot
+      - ../certbot/files:/etc/letsencrypt
+      - ./bootstrap.sh:/etc/bootstrap.sh
+    ports:
+      - 80:80
+    environment:
+      - email=hugo@fc.up.pt
+      - root_domain=hsal.es
+      - subdomains=social wiki noise survey tube paste u matrix xmpp
+    entrypoint: /bin/sh -c '/etc/bootstrap.sh'
