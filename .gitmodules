@@ -4,9 +4,6 @@
 [submodule "phpbb"]
 	path = phpbb
 	url = git@github.com:phpbb/phpbb.git
-[submodule "mediawiki"]
-	path = mediawiki
-	url = git@github.com:wikimedia/mediawiki.git
 [submodule "funkwhale"]
 	path = funk_whale
 	url = https://dev.funkwhale.audio/funkwhale/funkwhale.git
