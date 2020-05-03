@@ -1,12 +1,13 @@
 FROM php:fpm-alpine
 
-RUN apk update && apk add gettext-dev icu-dev zlib-dev libpng-dev gmp-dev mariadb-dev
+RUN apk update && apk add gettext-dev icu-dev zlib-dev libpng-dev gmp-dev \
+        mariadb-dev composer mariadb-client > /dev/null
 
-ARG exts=" bcmath exif gd gettext gmp intl mysqli opcache pdo pdo_mysql"
+ARG exts=" bcmath exif gd gettext gmp intl mysqli opcache pdo_mysql"
 
 RUN apk add --virtual .phpize-deps $PHPIZE_DEPS \
         && rm -rf /usr/share/php7 \
         && rm -rf /tmp/* \
-        && apk del .phpize-deps
+        && apk del .phpize-deps > /dev/null
 
-RUN docker-php-ext-install ${exts}
+RUN docker-php-ext-install ${exts} > /dev/null

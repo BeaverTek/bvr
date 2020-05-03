@@ -18,13 +18,22 @@ services:
       - 80:80
       - 443:443
     volumes:
+      # General nginx
       - ./docker/nginx/ssl-common.conf:/etc/nginx/include.d/ssl-common.conf
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./docker/nginx/landing.conf:/etc/nginx/conf.d/landing.conf
-      - ./docker/nginx/social.conf:/etc/nginx/conf.d/social.conf
+      # Certbot
       - ./docker/certbot/www:/var/www/certbot
       - ./docker/certbot/files:/etc/letsencrypt
+      # GNU social
+      - ./docker/social/social.conf:/etc/nginx/conf.d/social.conf
       - ./social/public:/var/www/social/public
+      # GNU FM
+      - ./docker/fm/gnufm.conf:/etc/nginx/conf.d/gnufm.conf
+      - ./fm/gnukebox:/var/www/gnukebox
+      - ./fm/nixtape:/var/www/nixtape
+    # logging:
+    #   driver: "none"
 
   certbot:
     image: certbot/certbot
@@ -44,35 +53,48 @@ services:
 
   php:
     depends_on:
-      - wait_for_db
+      - db
     build: ./docker/php
     restart: always
     tty: true
     ports:
       - 9000:9000
     volumes:
+      # Entrypoint
       - ./docker/php/entrypoint.sh:/var/entrypoint.sh
-      - ./docker/social/install.sh:/var/entrypoint.d/social_install.sh
+      # GNU social
       - ./social:/var/www/social
+      - ./docker/social/install.sh:/var/entrypoint.d/social_install.sh
+      # GNU FM
+      - ./fm/gnukebox:/var/www/gnukebox
+      - ./fm/nixtape:/var/www/nixtape
+      - ./docker/fm/gnukebox.sh:/var/entrypoint.d/gnukebox.sh
+      - ./docker/fm/nixtape.sh:/var/entrypoint.d/nixtape.sh
+      - ./docker/fm/install_gnukebox.php:/var/install/gnukebox.php
+      - ./docker/fm/install_nixtape.php:/var/install/nixtape.php
     env_file:
+      - ./docker/mariadb/mariadb.env
       - ./docker/social/social.env
+      - ./docker/fm/fm.env
     command: /var/entrypoint.sh
-
-  wait_for_db:
-    image: dadarek/wait-for-dependencies
-    depends_on:
-      - db
-    command: db:3306
 
   db:
     image: mariadb
-    environment:
-      - MYSQL_ROOT_PASSWORD=foobar
     env_file:
+      - ./docker/mariadb/mariadb.env
       - ./docker/social/social.env
+      - ./docker/fm/fm.env
     volumes:
-      - ./docker/mariadb/social.sh:/docker-entrypoint-initdb.d/social.sh
+      # Configuration
       - ./docker/mariadb/my.cnf:/etc/mysql/my.cnf
       - ./docker/mariadb/mariadb.cnf:/etc/mysql/mariadb.cnf
-    logging:
-      driver: "none"
+      # GNU social
+      - ./docker/mariadb/social.sh:/docker-entrypoint-initdb.d/social.sh
+      # GNU FM
+      - ./docker/mariadb/fm.sh:/docker-entrypoint-initdb.d/fm.sh
+    ports:
+      - 3306:3306
+    # logging:
+    #   driver: "none"
+
+

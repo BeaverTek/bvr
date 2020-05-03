@@ -12,5 +12,5 @@ services:
     environment:
       - email=hugo@fc.up.pt
       - root_domain=hsal.es
-      - subdomains=social wiki noise survey tube paste u matrix xmpp
+      - subdomains=social heard noise tube events boards forum wiki paste u survey matrix xmpp
     entrypoint: /bin/sh -c '/etc/bootstrap.sh'

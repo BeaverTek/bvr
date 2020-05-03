@@ -1,10 +1,13 @@
 #!/bin/sh
 
 if [ ! -e /var/www/social/config.php ]; then
-    echo "Installing GNU social"
-    mkdir -p /var/www/social/file/avatar
 
-    chown -R www-data:www-data /var/www/social
+    echo -e "Installing GNU social\nInstalling composer dependencies"
+
+    composer install
+
+    chmod g+w -R /var/www/social
+    chown -R :www-data /var/www/social
 
     php /var/www/social/scripts/install_cli.php --server="${SOCIAL_DOMAIN}" --sitename="${SOCIAL_SITENAME}" \
         --host=db --fancy=yes --database="${SOCIAL_DB}" \
