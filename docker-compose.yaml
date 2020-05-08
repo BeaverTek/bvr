@@ -58,6 +58,7 @@ services:
   php:
     depends_on:
       - db
+      # - keycloak
     build: ./docker/php
     restart: always
     tty: true
@@ -105,4 +106,10 @@ services:
     logging:
       driver: "none"
 
+  # keycloak:
+  #   build: ./docker/keycloak
+  #   env_file: ./docker/keycloak/keycloak.env
+  #   volumes:
+  #     - ./docker/keycloak/mysqladmin.sh:/install.sh
+  #     - ./docker/mariadb/wait_for_db.sh:/wait_for_db.sh
 
