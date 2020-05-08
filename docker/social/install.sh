@@ -4,6 +4,8 @@ if [ ! -e /var/www/social/config.php ]; then
 
     echo -e "Installing GNU social\nInstalling composer dependencies"
 
+    cd /var/www/social
+
     composer install
 
     chmod g+w -R /var/www/social
