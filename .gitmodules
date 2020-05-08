@@ -24,4 +24,4 @@
 	url = git@github.com:matrix-org/synapse.git
 [submodule "fm"]
 	path = fm
-	url = https://git.gnu.io/gnu/gnu-fm/
+	url = git@github.com:someonewithpc/gnufm.git
