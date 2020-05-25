@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   nginx:
-    build: ./docker/nginx
+    image: nginx:alpine
     depends_on:
       - php
     restart: always
@@ -12,18 +12,18 @@ services:
     command: /bin/sh -c \
            'while :; do
              sleep 6h & wait $${!};
-             /usr/local/openresty/bin/openresty -s reload;
-           done & /usr/local/openresty/bin/openresty -g "daemon off;"'
+             nginx -s reload;
+           done & nginx -g "daemon off;"'
     ports:
       - 80:80
       - 443:443
     volumes:
       # General nginx
-      - ./docker/nginx/ssl-common.conf:/usr/local/openresty/nginx/conf/include.d/ssl-common.conf
+      - ./docker/nginx/ssl-common.conf:/etc/nginx/include.d/ssl-common.conf
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
       # Landing page
       - ./docker/nginx/landing.conf:/etc/nginx/conf.d/landing.conf
-      - ./docker/nginx/landing.html:/usr/local/openresty/nginx/html/landing.html
+      - ./docker/nginx/landing.html:/etc/nginx/html/landing.html
       # Certbot
       - ./docker/certbot/www:/var/www/certbot
       - ./docker/certbot/files:/etc/letsencrypt
@@ -65,9 +65,12 @@ services:
     ports:
       - 9000:9000
     volumes:
+      # Config
+      - ./docker/php/php.ini:/etc/php/php.ini
+      - ./docker/php/php-fpm.conf:/usr/local/etc/php-fpm.conf
       # Entrypoint
       - ./docker/php/entrypoint.sh:/entrypoint.sh
-      - ./docker/mariadb/wait_for_db.sh:/wait_for_db.sh
+      - ./docker/db/wait_for_db.sh:/wait_for_db.sh
       # GNU social
       - ./social:/var/www/social
       - ./docker/social/install.sh:/var/entrypoint.d/social_install.sh
@@ -79,7 +82,7 @@ services:
       - ./docker/fm/install_gnukebox.php:/var/install/gnukebox.php
       - ./docker/fm/install_nixtape.php:/var/install/nixtape.php
     env_file:
-      - ./docker/mariadb/mariadb.env
+      - ./docker/db/db.env
       - ./docker/social/social.env
       - ./docker/fm/fm.env
     command: /entrypoint.sh
@@ -87,29 +90,44 @@ services:
   db:
     image: mariadb
     env_file:
-      - ./docker/mariadb/mariadb.env
+      - ./docker/db/db.env
       - ./docker/social/social.env
       - ./docker/fm/fm.env
       - ./docker/keycloak/keycloak.env
     volumes:
       # Configuration
-      - ./docker/mariadb/my.cnf:/etc/mysql/my.cnf
-      - ./docker/mariadb/mariadb.cnf:/etc/mysql/mariadb.cnf
+      - ./docker/db/my.cnf:/etc/mysql/my.cnf
+      - ./docker/db/mariadb.cnf:/etc/mysql/mariadb.cnf
       # GNU social
-      - ./docker/mariadb/social.sh:/docker-entrypoint-initdb.d/social.sh
+      - ./docker/db/social.sh:/docker-entrypoint-initdb.d/social.sh
       # GNU FM
-      - ./docker/mariadb/fm.sh:/docker-entrypoint-initdb.d/fm.sh
+      - ./docker/db/fm.sh:/docker-entrypoint-initdb.d/fm.sh
       # Keycloak
-      - ./docker/mariadb/keycloak.sh:/docker-entrypoint-initdb.d/keyclok.sh
+      - ./docker/db/keycloak.sh:/docker-entrypoint-initdb.d/keycloak.sh
     ports:
       - 3306:3306
-    logging:
-      driver: "none"
 
-  # keycloak:
-  #   build: ./docker/keycloak
-  #   env_file: ./docker/keycloak/keycloak.env
-  #   volumes:
-  #     - ./docker/keycloak/mysqladmin.sh:/install.sh
-  #     - ./docker/mariadb/wait_for_db.sh:/wait_for_db.sh
+  keycloak:
+    build: ./docker/keycloak
+    env_file: ./docker/keycloak/keycloak.env
+    ports:
+      - 8080:8080
+    volumes:
+      - ./docker/keycloak/mysqladmin.sh:/install.sh
+      - ./docker/db/wait_for_db.sh:/wait_for_db.sh
+
+  smtp:
+    build: ./docker/smtp
+    restart: always
+    ports:
+     - 25:25
+     - 465:465
+     - 587:587
+    environment:
+      - MAILNAME=mail.hsales.me
+    volumes:
+      - ./docker/certbot/files/:/etc/certs/
+      - ./docker/certbot/files/live/hsales.me/fullchain.pen:/etc/x509/https/tls.key
+      - ./docker/certbot/files/live/hsales.me/cert.pen:/etc/x509/https/tls.crt
+
 

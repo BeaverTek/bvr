@@ -11,6 +11,6 @@ services:
       - 80:80
     environment:
       - email=hugo@fc.up.pt
-      - root_domain=hsal.es
-      - subdomains=social heard noise tube events boards forum wiki paste u survey matrix xmpp
+      - root_domain=hsales.me
+      - subdomains=social heard login noise tube events boards forum wiki paste u survey matrix xmpp mail
     entrypoint: /bin/sh -c '/etc/bootstrap.sh'

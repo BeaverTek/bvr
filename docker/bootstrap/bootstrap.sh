@@ -31,13 +31,10 @@ if [ ! -e "${lets_path}/live//options-ssl-nginx.conf" ] \
     rm -Rf "${lets_path}/renewal/${root_domain}.conf"
 
     echo "### Requesting Let's Encrypt certificate for $root_domain ..."
-    # Format domain_args with the cartesian product of `root_domain` and `subdomains`
-    domain_args="-d "
-    for d in ${root_domain}; do
-        domain_args="$domain_args $d"
-        for s in ${subdomains}; do
-	    domain_args="${domain_args},${s}.${d}"
-        done
+
+    domain_args="-d ${root_domain}"
+    for s in ${subdomains}; do
+	domain_args="${domain_args} -d ${s}.${root_domain}"
     done
 
     # Select appropriate email arg

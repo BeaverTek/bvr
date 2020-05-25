@@ -8,8 +8,8 @@ RUN echo '                                  \
 server {                                    \
     listen [::]:80;                         \
     listen 80;                              \
-    server_name *.hsal.es;                  \
     # root and subdomains                   \
+    server_name *.hsales.me                 \
     location /.well-known/acme-challenge/ { \
         root /var/www/certbot;              \
     }                                       \
