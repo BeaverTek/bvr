@@ -6,7 +6,7 @@
 	url = git@github.com:phpbb/phpbb.git
 [submodule "funkwhale"]
 	path = funk_whale
-	url = https://dev.funkwhale.audio/funkwhale/funkwhale.git
+	url = git@github.com:someonewithpc/funkwhale.git
 [submodule "PeerTube"]
 	path = peer_tube
 	url = git@github.com:Chocobozzz/PeerTube.git
